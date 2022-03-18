@@ -1,0 +1,126 @@
+// android/build.gradle
+
+// based on:
+//
+// * https://github.com/facebook/react-native/blob/0.60-stable/template/android/build.gradle
+//   previous location:
+//   - https://github.com/facebook/react-native/blob/0.58-stable/local-cli/templates/HelloWorld/android/build.gradle
+//
+// * https://github.com/facebook/react-native/blob/0.60-stable/template/android/app/build.gradle
+//   previous location:
+//   - https://github.com/facebook/react-native/blob/0.58-stable/local-cli/templates/HelloWorld/android/app/build.gradle
+
+// These defaults should reflect the SDK versions used by
+// the minimum React Native version supported.
+def DEFAULT_COMPILE_SDK_VERSION = 28
+def DEFAULT_BUILD_TOOLS_VERSION = '28.0.3'
+def DEFAULT_MIN_SDK_VERSION = 16
+def DEFAULT_TARGET_SDK_VERSION = 28
+
+def safeExtGet(prop, fallback) {
+    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'maven'
+
+buildscript {
+    // The Android Gradle plugin is only required when opening the android folder stand-alone.
+    // This avoids unnecessary downloads and potential conflicts when the library is included as a
+    // module dependency in an application project.
+    // ref: https://docs.gradle.org/current/userguide/tutorial_using_tasks.html#sec:build_script_external_dependencies
+    if (project == rootProject) {
+        repositories {
+            google()
+            mavenCentral()
+            jcenter()
+        }
+        dependencies {
+            // This should reflect the Gradle plugin version used by
+            // the minimum React Native version supported.
+            classpath 'com.android.tools.build:gradle:3.4.1'
+        }
+    }
+}
+
+android {
+    packagingOptions {
+        pickFirst '**/*.so'
+    }
+    compileSdkVersion safeExtGet('compileSdkVersion', DEFAULT_COMPILE_SDK_VERSION)
+    buildToolsVersion safeExtGet('buildToolsVersion', DEFAULT_BUILD_TOOLS_VERSION)
+
+    sourceSets {
+        main.jniLibs.srcDirs '../install-android-rel-arm64-v8a/lib'
+    }
+
+    defaultConfig {
+        minSdkVersion safeExtGet('minSdkVersion', DEFAULT_MIN_SDK_VERSION)
+        targetSdkVersion safeExtGet('targetSdkVersion', DEFAULT_TARGET_SDK_VERSION)
+        versionCode 1
+        versionName "1.0"
+
+        externalNativeBuild {
+            cmake {
+                // Passes optional arguments to CMake.
+                arguments "-DANDROID_ARM_NEON=ON",
+                        "-DANDROID_TOOLCHAIN=clang",
+                        "-DANDROID_STL=c++_shared"
+            }
+        }
+    }
+    lintOptions {
+        abortOnError false
+    }
+    buildTypes {
+        debug {
+            ndk {
+                abiFilters "arm64-v8a"
+            }
+            minifyEnabled false
+            useProguard false
+            shrinkResources false
+        }
+        release {
+            ndk {
+                abiFilters "arm64-v8a"
+            }
+            // TODO: Add your own signing config for the release build.
+            // Signing with the debug keys for now, so `flutter run --release` works.
+            minifyEnabled false
+            useProguard false
+            shrinkResources false
+            signingConfig signingConfigs.debug
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            version "3.10.2"
+            path file('src/main/cpp/CMakeLists.txt')
+        }
+    }
+}
+
+
+repositories {
+    mavenLocal()
+    maven {
+        // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+        url("$rootDir/../node_modules/react-native/android")
+    }
+    google()
+    mavenCentral()
+    jcenter()
+}
+
+
+dependencies {
+    //noinspection GradleDynamicVersion
+    
+    implementation 'com.facebook.react:react-native:+'  // From node_modules
+}
+
+
+
+
+
