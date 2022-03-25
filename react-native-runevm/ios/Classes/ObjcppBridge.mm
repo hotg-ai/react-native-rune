@@ -8,7 +8,7 @@
 #import "ObjcppBridge.h"
 
 #include "runic.hpp"
-
+#include "rune.hpp"
 
 @implementation ObjcppBridge
 

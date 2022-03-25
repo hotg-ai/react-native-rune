@@ -8,14 +8,15 @@
  * https://github.com/facebook/react-native
  */
 
- import React, { Component } from 'react';
+ import React, { Component,PureComponent } from 'react';
+ import {RNCamera} from 'react-native-camera';
  import { Platform, StyleSheet, Text, View, Button } from 'react-native';
  import Runevm from 'react-native-runevm';
  import base64 from 'react-native-base64'
 
  export default class App extends Component<{}> {
    state = {
-     status: 'starting',
+     status: '--', 
      message: '--'
    };
    componentDidMount() {
@@ -37,9 +38,19 @@
      return (
        <View style={styles.container}>
          <Text style={styles.welcome}>☆Runevm example☆</Text>
-         <Text style={styles.instructions}>STATUS: {this.state.status}</Text>
-         <Text style={styles.welcome}>☆NATIVE CALLBACK MESSAGE☆</Text>
-         <Text style={styles.instructions}>{this.state.message}</Text>
+         <RNCamera 
+      ref={ref => {
+        this.camera = ref;
+      }}
+      captureAudio={false}
+      style={{flex: 1}}
+      type={RNCamera.Constants.Type.back}
+      androidCameraPermissionOptions={{
+        title: 'Permission to use camera',
+        message: 'We need your permission to use your camera',
+        buttonPositive: 'Okk',
+        buttonNegative: 'Cancel',
+      }} />
          <Button onPress={this.runRune} title="Run" color="#841584"/>
        </View>
      );
