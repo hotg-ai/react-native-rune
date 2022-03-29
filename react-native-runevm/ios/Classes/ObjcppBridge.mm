@@ -8,12 +8,13 @@
 #import "ObjcppBridge.h"
 
 #include "runic.hpp"
-#include "rune.hpp"
 
 @implementation ObjcppBridge
 
 + (NSArray*)loadManifestWithBytes: (const uint8_t *)bytes
                           ofLength:(int) len {
+    
+
     const auto optCapabilities = runic_common::manifest(bytes, len, true);
     if(!optCapabilities)
         return nullptr;

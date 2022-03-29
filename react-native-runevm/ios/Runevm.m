@@ -59,9 +59,9 @@ RCT_EXPORT_METHOD(runRune:(NSString *)base64Encoded lengths:(NSArray *)lengths c
     NSData *input = [[NSData alloc]initWithBase64EncodedString:base64Encoded options:0];
     NSUInteger count = [input length] ;
     const char *bytes = [input bytes];
-    NSArray *array = [ObjcppBridge callRunewithInput: bytes
+    NSString *output = [ObjcppBridge callRunewithInput: bytes
                                          withLengths:lengths];
-    callback(@[[NSString stringWithFormat: @"ok"]]);
+    callback(@[[NSString stringWithFormat: @"%@",output]]);
 }
 
 

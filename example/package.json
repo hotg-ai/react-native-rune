@@ -10,6 +10,9 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "base64-to-uint8array": "^1.0.0",
+    "buffer": "^6.0.3",
+    "image-js": "^0.33.2",
     "react": "17.0.2",
     "react-native": "0.65.1",
     "react-native-base64": "^0.2.1",

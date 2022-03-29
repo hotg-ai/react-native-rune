@@ -8,33 +8,29 @@
  * https://github.com/facebook/react-native
  */
 
- import React, { Component,PureComponent } from 'react';
+ import React, { Component, PureComponent} from 'react';
  import {RNCamera} from 'react-native-camera';
- import { Platform, StyleSheet, Text, View, Button } from 'react-native';
+ import { Platform, StyleSheet, Text, View, Pressable } from 'react-native';
  import Runevm from 'react-native-runevm';
  import base64 from 'react-native-base64'
-
+ import Image from 'image-js';
+ import toUint8Array from 'base64-to-uint8array';
  export default class App extends Component<{}> {
-   state = {
-     status: '--', 
-     message: '--'
-   };
+  state = {
+    status: '--', 
+    message: '--'
+  };
+
+
    componentDidMount() {
     
     getRune();
    };
 
-   async runRune() {
-    const bytes = new Uint8Array(224*224*3);
-    const b64encoded = base64.encodeFromByteArray(bytes);
-    let message = await Runevm.runRune(b64encoded,[224*224*3], (message) => {
-      console.log(">"+message);
-     
-      
-    });
-   }
+
 
    render() {
+    const { message } = this.state;
      return (
        <View style={styles.container}>
          <Text style={styles.welcome}>☆Runevm example☆</Text>
@@ -42,24 +38,62 @@
       ref={ref => {
         this.camera = ref;
       }}
+      pictureSize = {"640x480"}
       captureAudio={false}
-      style={{flex: 1}}
+      defaultVideoQuality= {RNCamera.Constants.VideoQuality['480p']}
+  
+      style={{width :320, height: 320}}
       type={RNCamera.Constants.Type.back}
       androidCameraPermissionOptions={{
         title: 'Permission to use camera',
         message: 'We need your permission to use your camera',
-        buttonPositive: 'Okk',
+        buttonPositive: 'Ok',
         buttonNegative: 'Cancel',
       }} />
-         <Button onPress={this.runRune} title="Run" color="#841584"/>
-       </View>
+         <Pressable style={styles.button} onPress={this.runRune} ><Text style={{color: "#FFFFFF",fontSize: 32}}>Run Inference</Text></Pressable>
+         <Text style={{fontSize: 24}}>{message}</Text>
+       </View> 
      );
-   }
- }
+    }
+
+
+
+
+    runRune = async () =>  {
+      //console.log(">>>>");
+      if (this.camera) {
+        let width = 224;
+        const options = { quality: 0.25, base64: true, width:width };
+        const data = await this.camera.takePictureAsync(options);
+        const bytesIn = toUint8Array(data.base64)
+        let image = await Image.load(bytesIn);
+        
+        console.log("resolution:",image.width,image.height);
+        var resized = image.resize({ width:width, height:width});
+        var grid = resized.getRGBAData();
+        let bytes = new Uint8Array(224*224*3);
+        for(let p=0;p<224*224;p++) {
+          bytes[p*3]=grid[p*4];
+          bytes[p*3+1]=grid[p*4+1];
+          bytes[p*3+2]=grid[p*4+2];
+        }
+        const b64encoded = base64.encodeFromByteArray(bytes);
+        let message = await Runevm.runRune(b64encoded,[224*224*3], (message) => {
+          this.setState(() => {
+            return { message: JSON.stringify(JSON.parse(message)[0]["elements"]) };
+          });
+        });
+      }
+      
+
+    }
+  }
+
+
 
  
- 
  async function getRune() {
+
   try {
     const runeURL = "https://rune-registry.web.app/registry/hotg-ai/inception_v1/app.rune";
     const bytes = new Uint8Array(await getBytes(runeURL));
@@ -98,6 +132,17 @@ function getBytes(url) {
   });
 }
  const styles = StyleSheet.create({
+  button: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 4,
+    elevation: 3,
+    marginTop: 15,
+    marginBottom: 15,
+    backgroundColor: 'purple',
+  },
    container: {
      flex: 1,
      justifyContent: 'center',
