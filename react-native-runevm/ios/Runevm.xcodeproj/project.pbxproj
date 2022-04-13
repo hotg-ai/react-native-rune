@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AF9829D827F5AD3C003F994A /* librune_native.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AFFD0C7727E33A3F003CD652 /* librune_native.a */; };
+		AF9829D927F5AD61003F994A /* librunecoral.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AF513F8127EDCD3D005E9C19 /* librunecoral.a */; };
 		AFFD0C5C27E1E837003CD652 /* Runevm.m in Sources */ = {isa = PBXBuildFile; fileRef = AFFD0C5727E1E837003CD652 /* Runevm.m */; };
 		AFFD0C5D27E1E837003CD652 /* runic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AFFD0C5927E1E837003CD652 /* runic.cpp */; };
 		AFFD0C5E27E1E837003CD652 /* ObjcppBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = AFFD0C5A27E1E837003CD652 /* ObjcppBridge.mm */; };
@@ -30,6 +32,7 @@
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRunevm.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRunevm.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		AF513F8127EDCD3D005E9C19 /* librunecoral.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = librunecoral.a; path = "install-ios-rel/lib/librunecoral.a"; sourceTree = "<group>"; };
+		AF9829D627F59ECC003F994A /* rune.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = rune.hpp; path = Classes/rune.hpp; sourceTree = "<group>"; };
 		AFFD0C5727E1E837003CD652 /* Runevm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Runevm.m; sourceTree = "<group>"; };
 		AFFD0C5827E1E837003CD652 /* ObjcppBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ObjcppBridge.h; path = Classes/ObjcppBridge.h; sourceTree = "<group>"; };
 		AFFD0C5927E1E837003CD652 /* runic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = runic.cpp; path = ../cpp/runic.cpp; sourceTree = "<group>"; };
@@ -56,6 +59,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AF9829D927F5AD61003F994A /* librunecoral.a in Frameworks */,
+				AF9829D827F5AD3C003F994A /* librune_native.a in Frameworks */,
 				AFFD0C6227E1E893003CD652 /* libfmtt.a in Frameworks */,
 				AFFD0C6327E1E893003CD652 /* libm3.a in Frameworks */,
 			);
@@ -75,6 +80,7 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				AF9829D627F59ECC003F994A /* rune.hpp */,
 				AFFD0C6527E1E95E003CD652 /* bridge.swift */,
 				AFFD0C5F27E1E893003CD652 /* install-ios-rel */,
 				AFFD0C6027E1E893003CD652 /* libfmtt.a */,

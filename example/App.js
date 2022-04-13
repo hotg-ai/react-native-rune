@@ -95,7 +95,7 @@
  async function getRune() {
 
   try {
-    const runeURL = "https://rune-registry.web.app/registry/hotg-ai/inception_v1/app.rune";
+    const runeURL = "https://gete.beer/runes/inception.rune";
     const bytes = new Uint8Array(await getBytes(runeURL));
     console.log("bytes.byteLength",bytes.byteLength);
     
@@ -103,7 +103,7 @@
  
     const b64encoded = base64.encodeFromByteArray(bytes);
     let message = await Runevm.loadWasm(b64encoded, (message) => {
-      console.log(">"+message);
+      console.log(">"+message); 
      
       
     });

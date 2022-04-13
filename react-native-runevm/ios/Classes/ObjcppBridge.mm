@@ -8,20 +8,34 @@
 #import "ObjcppBridge.h"
 
 #include "runic.hpp"
-
+#include "rune.hpp"
 @implementation ObjcppBridge
 
 + (NSArray*)loadManifestWithBytes: (const uint8_t *)bytes
                           ofLength:(int) len {
     
-
-    const auto optCapabilities = runic_common::manifest(bytes, len, true);
-    if(!optCapabilities)
-        return nullptr;
+    struct rune::Config cfg = {
+        .rune = bytes,
+        .rune_len = len,
+    };
+    rune::Runtime *runtime = NULL;
+    rune::Error *error = rune::rune_runtime_load(&cfg, &runtime);
+    if (error) {
+        printf("error 1");
+    }
+    rune::Metadata *inputs;
+    error = rune::rune_runtime_inputs(runtime, &inputs);
+    if (error) {
+        printf("error 2");
+    }
+    printf("whats up");
+    //const auto optCapabilities = runic_common::manifest(bytes, len, true);
+    //if(!optCapabilities)
+    //    return nullptr;
     
     auto *array = [[NSMutableArray alloc] init];
-    for(auto number: *optCapabilities)
-        [array addObject:[NSNumber numberWithInt:number]];
+    //for(auto number: *optCapabilities)
+    //    [array addObject:[NSNumber numberWithInt:number]];
     
     return array;
 }
