@@ -7,7 +7,7 @@ class Runetime {
         rune::Metadata *inputs; 
     public:             
         const char* run(rune::Config cfg) {
-
+            rune::InputTensors *input_tensors = rune::rune_runtime_input_tensors(runtime);
         }
 
         const char* load(rune::Config cfg) {
@@ -24,7 +24,7 @@ class Runetime {
                 rune::rune_error_free(error);
                 return msg;
             }
-            InputTensors *input_tensors = rune::rune_runtime_input_tensors(runtime);
+            
 
             return getManifest();
         }   
