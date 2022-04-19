@@ -7,9 +7,11 @@
 
 #include <memory>
 #include <jni.h>
+#include <optional>
 #include <android/log.h>
-#include <runic.hpp>
-
+#include <rune.hpp>
+#include <runetime.cpp>
+#include <vector>
 namespace
 {
     struct Deleter
@@ -62,7 +64,7 @@ namespace
         return JByteArrayData(std::move(data), size);
     }
 
-    struct AndroidLogger : public rune_vm::ILogger
+   /* struct AndroidLogger : public rune_vm::ILogger
     {
     private:
         void log(
@@ -89,7 +91,7 @@ namespace
 
             __android_log_print(androidSeverity, module.c_str(), "%s", message.c_str());
         }
-    };
+    };*/
 }
 
 extern "C"
@@ -105,27 +107,33 @@ extern "C"
         }
 
         // set logger
-        runic_common::setLogger(std::make_shared<AndroidLogger>());
+       // runic_common::setLogger(std::make_shared<AndroidLogger>());
 
         return JNI_VERSION_1_6;
     }
 
     JNIEXPORT jstring JNICALL
-    Java_ai_hotg_runevm_1fl_RunevmFlPlugin_getManifest(JNIEnv *env, jobject thiz, jbyteArray wasm)
+    Java_com_reactlibrary_RunevmModule_getManifest(JNIEnv *env, jobject thiz, jbyteArray wasm)
     {
+        Runetime runetime;
+
         const auto optData = getDataFromJArray(env, wasm);
         if (!optData)
             return NULL;
 
-        const auto optJson = runic_common::manifest(optData->data(), optData->size(), true);
-        if (!optJson)
-            return NULL;
+        struct rune::Config cfg = {
+            .rune = optData->data(),
+            .rune_len = (int )optData->size(),
+        };
+        
+        const char *result = runetime.load(cfg);
 
-        return env->NewStringUTF(optJson->c_str());
+        return env->NewStringUTF(result);
+
     }
 
     JNIEXPORT jstring JNICALL
-    Java_ai_hotg_runevm_1fl_RunevmFlPlugin_runRune(JNIEnv *env, jobject /*thiz */, jbyteArray input, jintArray lengthsj)
+    Java_com_reactlibrary_RunevmModule_runRune(JNIEnv *env, jobject /*thiz */, jbyteArray input, jintArray lengthsj)
     {
         const auto optData = getDataFromJArray(env, input);
         if (!optData)
@@ -135,24 +143,25 @@ extern "C"
 
         std::vector<uint8_t *> input_vector;
         std::vector<uint32_t> input_length_vector;
+        /*
         int i;
         int pos =0;
         for (i = 0; i < size; ++i)
         {
-            __android_log_print(ANDROID_LOG_DEBUG, "LOG_TAG", "########## length %lu %i",*lengths+i,i);
+            //__android_log_print(ANDROID_LOG_DEBUG, "LOG_TAG", "########## length %lu %i",*lengths+i,i);
             input_vector.push_back(reinterpret_cast<uint8_t*>(const_cast<uint8_t*>(optData->data()+pos)));
             input_length_vector.push_back(*(lengths+i));
             pos = pos + *(lengths+i);
-        }
+        }*/
 
     
-        const auto optJson = runic_common::callRune(input_vector, input_length_vector );
+        //const auto optJson = runic_common::callRune(input_vector, input_length_vector );
 
 
         //const auto optJson = runic_common::callRune({optData->data()}, {optData->size()});
-        if (!optJson)
-            return NULL;
+        //if (!optJson)
+        return NULL;
 
-        return env->NewStringUTF(optJson->c_str());
+        //return env->NewStringUTF(optJson->c_str());
     }
 }

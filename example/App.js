@@ -81,12 +81,12 @@
         let message = await Runevm.runRune(b64encoded,[224*224*3], (message) => {
           this.setState(() => {
             return { message: JSON.stringify(JSON.parse(message)[0]["elements"]) };
-          });
+          }); 
         });
-      }
-      
+      } 
+       
 
-    }
+    } 
   }
 
 
@@ -97,7 +97,7 @@
   try {
     const runeURL = "https://gete.beer/runes/inception.rune";
     const bytes = new Uint8Array(await getBytes(runeURL));
-    console.log("bytes.byteLength",bytes.byteLength);
+    console.log("bytes.byteLength #",bytes.byteLength);
     
 
  
