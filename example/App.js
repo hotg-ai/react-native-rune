@@ -51,7 +51,7 @@ export default class App extends Component<{}> {
             buttonNegative: 'Cancel',
           }} />
         <Pressable style={styles.button} onPress={this.runRune} ><Text style={{ color: "#FFFFFF", fontSize: 32 }}>Run Inference</Text></Pressable>
-        <Text style={{ fontSize: 24 }}>{message}</Text>
+        <Text style={{ fontSize: 12 }}>{message}</Text>
       </View>
     );
   }
@@ -62,8 +62,8 @@ export default class App extends Component<{}> {
   runRune = async () => {
     //console.log(">>>>");
     if (this.camera) {
-      let width = 224;
-      const options = { quality: 0.25, base64: true, width: width };
+      let width = 299;
+      const options = { quality: 0.25, base64: true, width: width * 2 };
       const data = await this.camera.takePictureAsync(options);
       const bytesIn = toUint8Array(data.base64)
       let image = await Image.load(bytesIn);
@@ -71,14 +71,14 @@ export default class App extends Component<{}> {
       console.log("resolution:", image.width, image.height);
       var resized = image.resize({ width: width, height: width });
       var grid = resized.getRGBAData();
-      let bytes = new Uint8Array(224 * 224 * 3);
-      for (let p = 0; p < 224 * 224; p++) {
+      let bytes = new Uint8Array(width * width * 3);
+      for (let p = 0; p < width * width; p++) {
         bytes[p * 3] = grid[p * 4];
         bytes[p * 3 + 1] = grid[p * 4 + 1];
         bytes[p * 3 + 2] = grid[p * 4 + 2];
       }
       const b64encoded = base64.encodeFromByteArray(bytes);
-      let message = await Runevm.runRune(b64encoded, [513 * 513 * 3], (message) => {
+      let message = await Runevm.runRune(b64encoded, [width * width * 3], (message) => {
         this.setState(() => {
           return { message: message };
           //return { message: JSON.stringify(JSON.parse(message)[0]["elements"]) };
@@ -96,7 +96,8 @@ export default class App extends Component<{}> {
 async function getRune() {
 
   try {
-    const runeURL = "https://gete.beer/runes/mobilenet.rune";
+    //const runeURL = "https://gete.beer/runes/mobilenet.rune";
+    const runeURL = "https://gete.beer/runes/inception.rune";
     const bytes = new Uint8Array(await getBytes(runeURL));
     console.log("bytes.byteLength #", bytes.byteLength);
 
