@@ -112,10 +112,12 @@ extern "C"
         return JNI_VERSION_1_6;
     }
 
+    Runetime runetime;
+
     JNIEXPORT jstring JNICALL
     Java_com_reactlibrary_RunevmModule_getManifest(JNIEnv *env, jobject thiz, jbyteArray wasm)
     {
-        Runetime runetime;
+
 
         const auto optData = getDataFromJArray(env, wasm);
         if (!optData)
@@ -126,14 +128,14 @@ extern "C"
             .rune_len = (int )optData->size(),
         };
         
-        const char *result = runetime.load(cfg);
-
-        return env->NewStringUTF(result);
+        std::string result = runetime.load(cfg);
+        __android_log_print(ANDROID_LOG_DEBUG, "LOG_TAG", "########## length %s",result.c_str());
+        return env->NewStringUTF(result.c_str());
 
     }
 
     JNIEXPORT jstring JNICALL
-    Java_com_reactlibrary_RunevmModule_runRune(JNIEnv *env, jobject /*thiz */, jbyteArray input, jintArray lengthsj)
+    Java_com_reactlibrary_RunevmModule_runRune(JNIEnv *env, jobject thiz , jbyteArray input, jintArray lengthsj)
     {
         const auto optData = getDataFromJArray(env, input);
         if (!optData)
@@ -141,27 +143,17 @@ extern "C"
         jsize size = env->GetArrayLength( lengthsj );
         jint *lengths = env->GetIntArrayElements(lengthsj, 0);
 
-        std::vector<uint8_t *> input_vector;
-        std::vector<uint32_t> input_length_vector;
-        /*
+
+
         int i;
         int pos =0;
         for (i = 0; i < size; ++i)
         {
-            //__android_log_print(ANDROID_LOG_DEBUG, "LOG_TAG", "########## length %lu %i",*lengths+i,i);
-            input_vector.push_back(reinterpret_cast<uint8_t*>(const_cast<uint8_t*>(optData->data()+pos)));
-            input_length_vector.push_back(*(lengths+i));
+            __android_log_print(ANDROID_LOG_DEBUG, "LOG_TAG", "########## length %lu %i",*lengths+i,i);
+            runetime.addInputTensor(1,reinterpret_cast<uint8_t*>(const_cast<uint8_t*>(optData->data()+pos)),*(lengths+i));
             pos = pos + *(lengths+i);
-        }*/
-
-    
-        //const auto optJson = runic_common::callRune(input_vector, input_length_vector );
-
-
-        //const auto optJson = runic_common::callRune({optData->data()}, {optData->size()});
-        //if (!optJson)
-        return NULL;
-
-        //return env->NewStringUTF(optJson->c_str());
+        }
+        std::string result = runetime.run();
+        return env->NewStringUTF(result.c_str());
     }
 }

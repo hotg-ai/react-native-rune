@@ -8,106 +8,107 @@
  * https://github.com/facebook/react-native
  */
 
- import React, { Component, PureComponent} from 'react';
- import {RNCamera} from 'react-native-camera';
- import { Platform, StyleSheet, Text, View, Pressable } from 'react-native';
- import Runevm from 'react-native-runevm';
- import base64 from 'react-native-base64'
- import Image from 'image-js';
- import toUint8Array from 'base64-to-uint8array';
- export default class App extends Component<{}> {
+import React, { Component, PureComponent } from 'react';
+import { RNCamera } from 'react-native-camera';
+import { Platform, StyleSheet, Text, View, Pressable } from 'react-native';
+import Runevm from 'react-native-runevm';
+import base64 from 'react-native-base64'
+import Image from 'image-js';
+import toUint8Array from 'base64-to-uint8array';
+export default class App extends Component<{}> {
   state = {
-    status: '--', 
+    status: '--',
     message: '--'
   };
 
 
-   componentDidMount() {
-    
+  componentDidMount() {
+
     getRune();
-   };
+  };
 
 
 
-   render() {
+  render() {
     const { message } = this.state;
-     return (
-       <View style={styles.container}>
-         <Text style={styles.welcome}>☆Runevm example☆</Text>
-         <RNCamera 
-      ref={ref => {
-        this.camera = ref;
-      }}
-      pictureSize = {"640x480"}
-      captureAudio={false}
-      defaultVideoQuality= {RNCamera.Constants.VideoQuality['480p']}
-  
-      style={{width :320, height: 320}}
-      type={RNCamera.Constants.Type.back}
-      androidCameraPermissionOptions={{
-        title: 'Permission to use camera',
-        message: 'We need your permission to use your camera',
-        buttonPositive: 'Ok',
-        buttonNegative: 'Cancel',
-      }} />
-         <Pressable style={styles.button} onPress={this.runRune} ><Text style={{color: "#FFFFFF",fontSize: 32}}>Run Inference</Text></Pressable>
-         <Text style={{fontSize: 24}}>{message}</Text>
-       </View> 
-     );
-    }
+    return (
+      <View style={styles.container}>
+        <Text style={styles.welcome}>☆Runevm example☆</Text>
+        <RNCamera
+          ref={ref => {
+            this.camera = ref;
+          }}
+          pictureSize={"640x480"}
+          captureAudio={false}
+          defaultVideoQuality={RNCamera.Constants.VideoQuality['480p']}
 
-
-
-
-    runRune = async () =>  {
-      //console.log(">>>>");
-      if (this.camera) {
-        let width = 224;
-        const options = { quality: 0.25, base64: true, width:width };
-        const data = await this.camera.takePictureAsync(options);
-        const bytesIn = toUint8Array(data.base64)
-        let image = await Image.load(bytesIn);
-        
-        console.log("resolution:",image.width,image.height);
-        var resized = image.resize({ width:width, height:width});
-        var grid = resized.getRGBAData();
-        let bytes = new Uint8Array(224*224*3);
-        for(let p=0;p<224*224;p++) {
-          bytes[p*3]=grid[p*4];
-          bytes[p*3+1]=grid[p*4+1];
-          bytes[p*3+2]=grid[p*4+2];
-        }
-        const b64encoded = base64.encodeFromByteArray(bytes);
-        let message = await Runevm.runRune(b64encoded,[224*224*3], (message) => {
-          this.setState(() => {
-            return { message: JSON.stringify(JSON.parse(message)[0]["elements"]) };
-          }); 
-        });
-      } 
-       
-
-    } 
+          style={{ width: 320, height: 320 }}
+          type={RNCamera.Constants.Type.back}
+          androidCameraPermissionOptions={{
+            title: 'Permission to use camera',
+            message: 'We need your permission to use your camera',
+            buttonPositive: 'Ok',
+            buttonNegative: 'Cancel',
+          }} />
+        <Pressable style={styles.button} onPress={this.runRune} ><Text style={{ color: "#FFFFFF", fontSize: 32 }}>Run Inference</Text></Pressable>
+        <Text style={{ fontSize: 24 }}>{message}</Text>
+      </View>
+    );
   }
 
 
 
- 
- async function getRune() {
+
+  runRune = async () => {
+    //console.log(">>>>");
+    if (this.camera) {
+      let width = 224;
+      const options = { quality: 0.25, base64: true, width: width };
+      const data = await this.camera.takePictureAsync(options);
+      const bytesIn = toUint8Array(data.base64)
+      let image = await Image.load(bytesIn);
+
+      console.log("resolution:", image.width, image.height);
+      var resized = image.resize({ width: width, height: width });
+      var grid = resized.getRGBAData();
+      let bytes = new Uint8Array(224 * 224 * 3);
+      for (let p = 0; p < 224 * 224; p++) {
+        bytes[p * 3] = grid[p * 4];
+        bytes[p * 3 + 1] = grid[p * 4 + 1];
+        bytes[p * 3 + 2] = grid[p * 4 + 2];
+      }
+      const b64encoded = base64.encodeFromByteArray(bytes);
+      let message = await Runevm.runRune(b64encoded, [513 * 513 * 3], (message) => {
+        this.setState(() => {
+          return { message: message };
+          //return { message: JSON.stringify(JSON.parse(message)[0]["elements"]) };
+        });
+      });
+    }
+
+
+  }
+}
+
+
+
+
+async function getRune() {
 
   try {
-    const runeURL = "https://gete.beer/runes/inception.rune";
+    const runeURL = "https://gete.beer/runes/mobilenet.rune";
     const bytes = new Uint8Array(await getBytes(runeURL));
-    console.log("bytes.byteLength #",bytes.byteLength);
-    
+    console.log("bytes.byteLength #", bytes.byteLength);
 
- 
+
+
     const b64encoded = base64.encodeFromByteArray(bytes);
     let message = await Runevm.loadWasm(b64encoded, (message) => {
-      console.log(">"+message); 
-     
-      
+      console.log(">" + message);
+
+
     });
- 
+
 
 
   } catch (error) {
@@ -117,21 +118,21 @@
 
 function getBytes(url) {
   return new Promise((accept, reject) => {
-      var req = new XMLHttpRequest();
-      req.open("GET", url, true);
-      req.responseType = "arraybuffer";
+    var req = new XMLHttpRequest();
+    req.open("GET", url, true);
+    req.responseType = "arraybuffer";
 
-      req.onload = function(event) {
-          var resp = req.response;
-          if(resp) {
-              accept(resp);
-          }
-      };
+    req.onload = function (event) {
+      var resp = req.response;
+      if (resp) {
+        accept(resp);
+      }
+    };
 
-      req.send(null);
+    req.send(null);
   });
 }
- const styles = StyleSheet.create({
+const styles = StyleSheet.create({
   button: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -143,21 +144,20 @@ function getBytes(url) {
     marginBottom: 15,
     backgroundColor: 'purple',
   },
-   container: {
-     flex: 1,
-     justifyContent: 'center',
-     alignItems: 'center',
-     backgroundColor: '#F5FCFF',
-   },
-   welcome: {
-     fontSize: 20,
-     textAlign: 'center',
-     margin: 10,
-   },
-   instructions: {
-     textAlign: 'center',
-     color: '#333333',
-     marginBottom: 5,
-   },
- });
- 
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5FCFF',
+  },
+  welcome: {
+    fontSize: 20,
+    textAlign: 'center',
+    margin: 10,
+  },
+  instructions: {
+    textAlign: 'center',
+    color: '#333333',
+    marginBottom: 5,
+  },
+});

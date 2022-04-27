@@ -387,7 +387,7 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - react-native-camera (from `../node_modules/react-native-camera`)
-  - react-native-runevm (from `../node_modules/react-native-runevm`)
+  - react-native-runevm (from `../../react-native-runevm`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
@@ -454,7 +454,7 @@ EXTERNAL SOURCES:
   react-native-camera:
     :path: "../node_modules/react-native-camera"
   react-native-runevm:
-    :path: "../node_modules/react-native-runevm"
+    :path: "../../react-native-runevm"
   React-perflogger:
     :path: "../node_modules/react-native/ReactCommon/reactperflogger"
   React-RCTActionSheet:
@@ -531,4 +531,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 7c89affce83e0c6087b19fe3652cf5e327b95baf
 
-COCOAPODS: 1.10.2
+COCOAPODS: 1.11.3
