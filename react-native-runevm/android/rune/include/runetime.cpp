@@ -82,12 +82,22 @@ public:
             rune::ElementType element_type = rune_tensor_element_type(fixed);
             size_t rank = rune::rune_tensor_rank(fixed);
             const size_t *dimensions = rune::rune_tensor_dimensions(fixed);
-            // output.append(std::string("rank: %zu", rank));
-            if (element_type == rune::F32 && rank == 2 && dimensions[0] == 1 && dimensions[1] == 1)
+            // uint8_t output = *(uint8_t *)rune::rune_tensor_buffer_readonly(fixed);
+            output.append(std::string(" output_id:") + std::to_string(output_id));
+            output.append(std::string(" rank:") + std::to_string(rank));
+            output.append(std::string(" element_type:") + std::to_string(element_type));
+            for (int i = 0; i < rank; i++)
             {
-                float value = *(float *)rune::rune_tensor_buffer_readonly(fixed);
-                printf("\tOutput %d = [[%f]]\n", output_id, value);
+                output.append(std::to_string(i) + std::string(" dimensions:") + std::to_string(dimensions[i]));
             }
+
+            // output.append(std::string(" dimensions: %s", dimensions));
+            //  output.append(std::string("rank: %zu", rank));
+            //  if (element_type == rune::F32 && rank == 2 && dimensions[0] == 1 && dimensions[1] == 1)
+            //{
+            //  float value = *(float *)rune::rune_tensor_buffer_readonly(fixed);
+            //  output.append("\tOutput %d = [[%f]]\n", output_id, value);
+            // }
         }
         output.append(std::string("]"));
         return output;
