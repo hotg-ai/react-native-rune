@@ -64,34 +64,34 @@ namespace
         return JByteArrayData(std::move(data), size);
     }
 
-   /* struct AndroidLogger : public rune_vm::ILogger
-    {
-    private:
-        void log(
-            const rune_vm::Severity severity,
-            const std::string &module,
-            const std::string &message) const noexcept
-        {
-            const auto androidSeverity = [severity]
-            {
-                switch (severity)
-                {
-                case rune_vm::Severity::Debug:
-                    return ANDROID_LOG_DEBUG;
-                case rune_vm::Severity::Info:
-                    return ANDROID_LOG_INFO;
-                case rune_vm::Severity::Warning:
-                    return ANDROID_LOG_WARN;
-                case rune_vm::Severity::Error:
-                    return ANDROID_LOG_ERROR;
-                default:
-                    return ANDROID_LOG_ERROR;
-                }
-            }();
+    /* struct AndroidLogger : public rune_vm::ILogger
+     {
+     private:
+         void log(
+             const rune_vm::Severity severity,
+             const std::string &module,
+             const std::string &message) const noexcept
+         {
+             const auto androidSeverity = [severity]
+             {
+                 switch (severity)
+                 {
+                 case rune_vm::Severity::Debug:
+                     return ANDROID_LOG_DEBUG;
+                 case rune_vm::Severity::Info:
+                     return ANDROID_LOG_INFO;
+                 case rune_vm::Severity::Warning:
+                     return ANDROID_LOG_WARN;
+                 case rune_vm::Severity::Error:
+                     return ANDROID_LOG_ERROR;
+                 default:
+                     return ANDROID_LOG_ERROR;
+                 }
+             }();
 
-            __android_log_print(androidSeverity, module.c_str(), "%s", message.c_str());
-        }
-    };*/
+             __android_log_print(androidSeverity, module.c_str(), "%s", message.c_str());
+         }
+     };*/
 }
 
 extern "C"
@@ -107,7 +107,7 @@ extern "C"
         }
 
         // set logger
-       // runic_common::setLogger(std::make_shared<AndroidLogger>());
+        // runic_common::setLogger(std::make_shared<AndroidLogger>());
 
         return JNI_VERSION_1_6;
     }
@@ -118,42 +118,50 @@ extern "C"
     Java_com_reactlibrary_RunevmModule_getManifest(JNIEnv *env, jobject thiz, jbyteArray wasm)
     {
 
-
         const auto optData = getDataFromJArray(env, wasm);
         if (!optData)
             return NULL;
 
         struct rune::Config cfg = {
             .rune = optData->data(),
-            .rune_len = (int )optData->size(),
+            .rune_len = (int)optData->size(),
         };
-        
-        std::string result = runetime.load(cfg);
-        __android_log_print(ANDROID_LOG_DEBUG, "LOG_TAG", "########## length %s",result.c_str());
-        return env->NewStringUTF(result.c_str());
 
+        std::string result = runetime.load(cfg);
+
+        return env->NewStringUTF(result.c_str());
+    }
+
+    JNIEXPORT jboolean JNICALL
+    Java_com_reactlibrary_RunevmModule_addInputTensor(JNIEnv *env, jobject thiz, jint node_id, jbyteArray input, jint type, jintArray dimensions, jint rank)
+    {
+
+        const auto bytesArray = getDataFromJArray(env, input);
+        if (!bytesArray)
+            return NULL;
+        const uint8_t *bytes = bytesArray->data();
+        jint length = bytesArray->size();
+        jint *dimensionsArray = env->GetIntArrayElements(dimensions, 0);
+        runetime.addInputTensor(node_id, bytesArray->data(), length, (uint32_t *)dimensionsArray, rank, type);
+        return true;
     }
 
     JNIEXPORT jstring JNICALL
-    Java_com_reactlibrary_RunevmModule_runRune(JNIEnv *env, jobject thiz , jbyteArray input, jintArray lengthsj)
+    Java_com_reactlibrary_RunevmModule_runRune(JNIEnv *env, jobject thiz)
     {
-        const auto optData = getDataFromJArray(env, input);
-        if (!optData)
-            return NULL;
-        jsize size = env->GetArrayLength( lengthsj );
-        jint *lengths = env->GetIntArrayElements(lengthsj, 0);
-
-
-
-        int i;
-        int pos =0;
-        for (i = 0; i < size; ++i)
-        {
-            __android_log_print(ANDROID_LOG_DEBUG, "LOG_TAG", "########## length %lu %i",*lengths+i,i);
-            runetime.addInputTensor(1,reinterpret_cast<uint8_t*>(const_cast<uint8_t*>(optData->data()+pos)),*(lengths+i));
-            pos = pos + *(lengths+i);
-        }
         std::string result = runetime.run();
+        __android_log_print(ANDROID_LOG_DEBUG, "LOG_TAG", "INFERENCE OUTPUT %s", result.c_str());
+
+        // hack to avoid non utf8 bytes ;-(
+        const char *output_pos = result.data();
+        for (int i = 0; i < result.length(); i++)
+        {
+            if (*(output_pos + i) >= 128)
+            {
+                result.replace(i, 1, " ");
+            }
+        }
+
         return env->NewStringUTF(result.c_str());
     }
 }

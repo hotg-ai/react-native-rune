@@ -18,23 +18,23 @@ import toUint8Array from 'base64-to-uint8array';
 export default class App extends Component<{}> {
   state = {
     status: '--',
-    message: '--'
+    message: 'Loading rune from server...'
   };
 
 
   componentDidMount() {
 
-    getRune();
+    this.loadRune();
   };
 
 
 
   render() {
-    const { message } = this.state;
+    const { message, status } = this.state;
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>☆Runevm example☆</Text>
-        <RNCamera
+        <Text style={styles.welcome}>Rune bindings example</Text>
+        {message != 'Loading rune from server...' && (<RNCamera
           ref={ref => {
             this.camera = ref;
           }}
@@ -42,15 +42,15 @@ export default class App extends Component<{}> {
           captureAudio={false}
           defaultVideoQuality={RNCamera.Constants.VideoQuality['480p']}
 
-          style={{ width: 320, height: 320 }}
+          style={{ width: 200, height: 300 }}
           type={RNCamera.Constants.Type.back}
           androidCameraPermissionOptions={{
             title: 'Permission to use camera',
             message: 'We need your permission to use your camera',
             buttonPositive: 'Ok',
             buttonNegative: 'Cancel',
-          }} />
-        <Pressable style={styles.button} onPress={this.runRune} ><Text style={{ color: "#FFFFFF", fontSize: 32 }}>Run Inference</Text></Pressable>
+          }} />)}
+        {message != 'Loading rune from server...' && (<Pressable style={styles.button} onPress={this.runRune} ><Text style={{ color: "#FFFFFF", fontSize: 32 }}>Run Inference</Text></Pressable>)}
         <Text style={{ fontSize: 12 }}>{message}</Text>
       </View>
     );
@@ -58,6 +58,30 @@ export default class App extends Component<{}> {
 
 
 
+  loadRune = async () => {
+    try {
+      //const runeURL = "https://gete.beer/runes/mobilenet.rune";
+      const runeURL = "https://gete.beer/runes/inception.rune";
+      const bytes = new Uint8Array(await getBytes(runeURL));
+      console.log("bytes.byteLength #", bytes.byteLength);
+
+
+
+      const b64encoded = base64.encodeFromByteArray(bytes);
+      let message = await Runevm.loadWasm(b64encoded, (message) => {
+        this.setState(() => {
+          return { message: message };
+        });
+
+
+      });
+
+
+
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   runRune = async () => {
     //console.log(">>>>");
@@ -78,7 +102,12 @@ export default class App extends Component<{}> {
         bytes[p * 3 + 2] = grid[p * 4 + 2];
       }
       const b64encoded = base64.encodeFromByteArray(bytes);
-      let message = await Runevm.runRune(b64encoded, [width * width * 3], (message) => {
+      await Runevm.addInput(1, b64encoded, [width, width, 3], 0, (message) => {
+        this.setState(() => {
+          return { message: message };
+        });
+      });
+      let message = await Runevm.runRune((message) => {
         this.setState(() => {
           return { message: message };
           //return { message: JSON.stringify(JSON.parse(message)[0]["elements"]) };
@@ -93,29 +122,7 @@ export default class App extends Component<{}> {
 
 
 
-async function getRune() {
 
-  try {
-    //const runeURL = "https://gete.beer/runes/mobilenet.rune";
-    const runeURL = "https://gete.beer/runes/inception.rune";
-    const bytes = new Uint8Array(await getBytes(runeURL));
-    console.log("bytes.byteLength #", bytes.byteLength);
-
-
-
-    const b64encoded = base64.encodeFromByteArray(bytes);
-    let message = await Runevm.loadWasm(b64encoded, (message) => {
-      console.log(">" + message);
-
-
-    });
-
-
-
-  } catch (error) {
-    console.error(error);
-  }
-};
 
 function getBytes(url) {
   return new Promise((accept, reject) => {

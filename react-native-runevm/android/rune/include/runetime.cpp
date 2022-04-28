@@ -25,15 +25,18 @@ public:
         return getOutput();
     }
 
-    void addInputTensor(int raw_node_id, uint8_t *input, uint32_t length)
+    void addInputTensor(int raw_node_id, uint8_t *input, uint32_t length, uint32_t *dimensions, int rank, int type)
     {
-        size_t dimensions[3] = {299, 299, 3};
+        size_t dimensionsUnsigned[rank];
+        for(int i = 0;i<rank;i++) {
+            dimensionsUnsigned[i]= *(dimensions+i);
+        }
         rune::Tensor *raw_input = rune_input_tensors_insert(
             input_tensors,
             raw_node_id,
-            rune::U8,
-            dimensions,
-            3);
+            rune::ElementType(type),
+            dimensionsUnsigned,
+            rank);
         uint8_t *raw_input_buffer = rune::rune_tensor_buffer(raw_input);
         memcpy(raw_input_buffer, input, length);
     }
@@ -84,7 +87,7 @@ public:
             output.append(std::string("\"output_id:\"") + std::to_string(output_id) + std::string(","));
             if (!fixed)
             {
-                //string tensor
+                // string tensor
                 const rune::StringTensor *variable = rune::rune_output_tensor_as_string_tensor(output_tensor);
                 size_t rank = rune::rune_string_tensor_rank(variable);
                 const size_t *dimensions = rune::rune_string_tensor_dimensions(variable);
@@ -100,7 +103,7 @@ public:
                     }
                     length *= dimensions[i];
                     output.append(std::to_string(dimensions[i]));
-                    //output.append(std::string(">>>> dimensions:") + std::to_string(i) + std::string(" dimensions:") + std::to_string(dimensions[i]));
+                    // output.append(std::string(">>>> dimensions:") + std::to_string(i) + std::string(" dimensions:") + std::to_string(dimensions[i]));
                 }
                 output.append(std::string("]") + std::string(","));
                 output.append(std::string("\"size\":") + std::to_string(length) + std::string(","));
@@ -108,7 +111,7 @@ public:
 
                 for (int i = 0; i < length; i++)
                 {
-                    //comma sep
+                    // comma sep
                     if (i > 0)
                     {
                         output.append(std::string(","));
@@ -116,13 +119,13 @@ public:
                     const uint8_t *pointer;
                     int strlength = rune::rune_string_tensor_get_by_index(variable, i, &pointer);
                     const char *text = reinterpret_cast<const char *>(pointer);
-                    output.append(std::string(text));
+                    output.append(std::string("\"")+std::string(text)+std::string("\""));
                 }
                 output.append(std::string("]"));
             }
             else
             {
-                //fixed tensor
+                // fixed tensor
                 rune::ElementType element_type = rune::rune_tensor_element_type(fixed);
                 size_t rank = rune::rune_tensor_rank(fixed);
                 const size_t *dimensions = rune::rune_tensor_dimensions(fixed);
@@ -140,7 +143,7 @@ public:
                     }
                     length *= dimensions[i];
                     output.append(std::to_string(dimensions[i]));
-                    //output.append(std::string(">>>> dimensions:") + std::to_string(i) + std::string(" dimensions:") + std::to_string(dimensions[i]));
+                    // output.append(std::string(">>>> dimensions:") + std::to_string(i) + std::string(" dimensions:") + std::to_string(dimensions[i]));
                 }
                 output.append(std::string("]") + std::string(","));
                 output.append(std::string("\"size\":") + std::to_string(length) + std::string(","));
@@ -148,12 +151,12 @@ public:
 
                 for (int i = 0; i < length; i++)
                 {
-                    //comma sep
+                    // comma sep
                     if (i > 0)
                     {
                         output.append(std::string(","));
                     }
-                    //check element
+                    // check element
 
                     if (element_type == rune::U8)
                     {
