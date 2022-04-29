@@ -7,9 +7,11 @@
 
 #include <memory>
 #include <jni.h>
+#include <optional>
 #include <android/log.h>
-#include <runic.hpp>
-
+#include <rune.hpp>
+#include <runetime.cpp>
+#include <vector>
 namespace
 {
     struct Deleter
@@ -62,34 +64,34 @@ namespace
         return JByteArrayData(std::move(data), size);
     }
 
-    struct AndroidLogger : public rune_vm::ILogger
-    {
-    private:
-        void log(
-            const rune_vm::Severity severity,
-            const std::string &module,
-            const std::string &message) const noexcept
-        {
-            const auto androidSeverity = [severity]
-            {
-                switch (severity)
-                {
-                case rune_vm::Severity::Debug:
-                    return ANDROID_LOG_DEBUG;
-                case rune_vm::Severity::Info:
-                    return ANDROID_LOG_INFO;
-                case rune_vm::Severity::Warning:
-                    return ANDROID_LOG_WARN;
-                case rune_vm::Severity::Error:
-                    return ANDROID_LOG_ERROR;
-                default:
-                    return ANDROID_LOG_ERROR;
-                }
-            }();
+    /* struct AndroidLogger : public rune_vm::ILogger
+     {
+     private:
+         void log(
+             const rune_vm::Severity severity,
+             const std::string &module,
+             const std::string &message) const noexcept
+         {
+             const auto androidSeverity = [severity]
+             {
+                 switch (severity)
+                 {
+                 case rune_vm::Severity::Debug:
+                     return ANDROID_LOG_DEBUG;
+                 case rune_vm::Severity::Info:
+                     return ANDROID_LOG_INFO;
+                 case rune_vm::Severity::Warning:
+                     return ANDROID_LOG_WARN;
+                 case rune_vm::Severity::Error:
+                     return ANDROID_LOG_ERROR;
+                 default:
+                     return ANDROID_LOG_ERROR;
+                 }
+             }();
 
-            __android_log_print(androidSeverity, module.c_str(), "%s", message.c_str());
-        }
-    };
+             __android_log_print(androidSeverity, module.c_str(), "%s", message.c_str());
+         }
+     };*/
 }
 
 extern "C"
@@ -105,54 +107,61 @@ extern "C"
         }
 
         // set logger
-        runic_common::setLogger(std::make_shared<AndroidLogger>());
+        // runic_common::setLogger(std::make_shared<AndroidLogger>());
 
         return JNI_VERSION_1_6;
     }
 
+    Runetime runetime;
+
     JNIEXPORT jstring JNICALL
-    Java_ai_hotg_runevm_1fl_RunevmFlPlugin_getManifest(JNIEnv *env, jobject thiz, jbyteArray wasm)
+    Java_com_reactlibrary_RunevmModule_getManifest(JNIEnv *env, jobject thiz, jbyteArray wasm)
     {
+
         const auto optData = getDataFromJArray(env, wasm);
         if (!optData)
             return NULL;
 
-        const auto optJson = runic_common::manifest(optData->data(), optData->size(), true);
-        if (!optJson)
-            return NULL;
+        struct rune::Config cfg = {
+            .rune = optData->data(),
+            .rune_len = (int)optData->size(),
+        };
 
-        return env->NewStringUTF(optJson->c_str());
+        std::string result = runetime.load(cfg);
+
+        return env->NewStringUTF(result.c_str());
+    }
+
+    JNIEXPORT jboolean JNICALL
+    Java_com_reactlibrary_RunevmModule_addInputTensor(JNIEnv *env, jobject thiz, jint node_id, jbyteArray input, jint type, jintArray dimensions, jint rank)
+    {
+
+        const auto bytesArray = getDataFromJArray(env, input);
+        if (!bytesArray)
+            return NULL;
+        const uint8_t *bytes = bytesArray->data();
+        jint length = bytesArray->size();
+        jint *dimensionsArray = env->GetIntArrayElements(dimensions, 0);
+        runetime.addInputTensor(node_id, bytesArray->data(), length, (uint32_t *)dimensionsArray, rank, type);
+        return true;
     }
 
     JNIEXPORT jstring JNICALL
-    Java_ai_hotg_runevm_1fl_RunevmFlPlugin_runRune(JNIEnv *env, jobject /*thiz */, jbyteArray input, jintArray lengthsj)
+    Java_com_reactlibrary_RunevmModule_runRune(JNIEnv *env, jobject thiz)
     {
-        const auto optData = getDataFromJArray(env, input);
-        if (!optData)
-            return NULL;
-        jsize size = env->GetArrayLength( lengthsj );
-        jint *lengths = env->GetIntArrayElements(lengthsj, 0);
+        std::string result = runetime.run();
+        __android_log_print(ANDROID_LOG_DEBUG, "LOG_TAG", "INFERENCE OUTPUT %s", result.c_str());
 
-        std::vector<uint8_t *> input_vector;
-        std::vector<uint32_t> input_length_vector;
-        int i;
-        int pos =0;
-        for (i = 0; i < size; ++i)
+        // hack to avoid non utf8 bytes ;-(
+        const char *output_pos = result.data();
+        for (int i = 0; i < result.length(); i++)
         {
-            __android_log_print(ANDROID_LOG_DEBUG, "LOG_TAG", "########## length %lu %i",*lengths+i,i);
-            input_vector.push_back(reinterpret_cast<uint8_t*>(const_cast<uint8_t*>(optData->data()+pos)));
-            input_length_vector.push_back(*(lengths+i));
-            pos = pos + *(lengths+i);
+            if (*(output_pos + i) >= 128)
+            {
+                result.replace(i, 1, " ");
+            }
         }
 
-    
-        const auto optJson = runic_common::callRune(input_vector, input_length_vector );
-
-
-        //const auto optJson = runic_common::callRune({optData->data()}, {optData->size()});
-        if (!optJson)
-            return NULL;
-
-        return env->NewStringUTF(optJson->c_str());
+        return env->NewStringUTF(result.c_str());
     }
 }

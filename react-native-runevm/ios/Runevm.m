@@ -39,29 +39,24 @@ RCT_EXPORT_METHOD(loadWasm:(NSString *)base64Encoded callback:(RCTResponseSender
     NSData *wasm = [[NSData alloc]initWithBase64EncodedString:base64Encoded options:0];
     NSUInteger count = [wasm length] ;
     const char *bytes = [wasm bytes];
-    NSArray *array = [ObjcppBridge loadManifestWithBytes: bytes
-                                                ofLength:count];
-    Byte* manifestBytes = calloc(array.count, sizeof(Byte));
-
-    [array enumerateObjectsUsingBlock:^(NSNumber* number, NSUInteger index, BOOL* stop){
-
-        manifestBytes[index] = number.integerValue;
-    }];
-    
-    NSString *manifest = [NSString stringWithUTF8String:manifestBytes];
-    NSLog(@"manifest %@", manifest);
+    NSString *manifest = [ObjcppBridge loadManifestWithBytes: (uint8_t *)bytes
+                                                ofLength:(int)count];
     callback(@[[NSString stringWithFormat: @"%@",manifest]]);
 }
 
-
-RCT_EXPORT_METHOD(runRune:(NSString *)base64Encoded lengths:(NSArray *)lengths callback:(RCTResponseSenderBlock)callback)
+RCT_EXPORT_METHOD(addInput:(NSNumber * _Nonnull)nodeId  input:(NSString *)base64Encoded  dimensions:(NSArray *)dimensions type:(NSNumber * _Nonnull)type  callback:(RCTResponseSenderBlock)callback)
 {
-    NSData *input = [[NSData alloc]initWithBase64EncodedString:base64Encoded options:0];
-    NSUInteger count = [input length] ;
-    const char *bytes = [input bytes];
-    NSArray *array = [ObjcppBridge callRunewithInput: bytes
-                                         withLengths:lengths];
+    NSLog(@"addInputTensor");
+    NSData *data = [[NSData alloc]initWithBase64EncodedString:base64Encoded options:0];
+    [ObjcppBridge addInputTensor:[nodeId intValue] input:data type:[type intValue] dimensions:dimensions];
     callback(@[[NSString stringWithFormat: @"ok"]]);
+}
+
+RCT_EXPORT_METHOD(runRune:(RCTResponseSenderBlock)callback)
+{
+    NSLog(@"runRune");
+    NSString *output = [ObjcppBridge callRune];
+    callback(@[[NSString stringWithFormat: @"%@",output]]);
 }
 
 

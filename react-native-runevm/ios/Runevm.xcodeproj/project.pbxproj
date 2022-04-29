@@ -7,11 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AF9829D827F5AD3C003F994A /* librune_native.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AFFD0C7727E33A3F003CD652 /* librune_native.a */; };
+		AF9829D927F5AD61003F994A /* librunecoral.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AF513F8127EDCD3D005E9C19 /* librunecoral.a */; };
 		AFFD0C5C27E1E837003CD652 /* Runevm.m in Sources */ = {isa = PBXBuildFile; fileRef = AFFD0C5727E1E837003CD652 /* Runevm.m */; };
 		AFFD0C5D27E1E837003CD652 /* runic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AFFD0C5927E1E837003CD652 /* runic.cpp */; };
 		AFFD0C5E27E1E837003CD652 /* ObjcppBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = AFFD0C5A27E1E837003CD652 /* ObjcppBridge.mm */; };
-		AFFD0C6227E1E893003CD652 /* libfmtt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AFFD0C6027E1E893003CD652 /* libfmtt.a */; };
-		AFFD0C6327E1E893003CD652 /* libm3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AFFD0C6127E1E893003CD652 /* libm3.a */; };
 		AFFD0C6627E1E95E003CD652 /* bridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFFD0C6527E1E95E003CD652 /* bridge.swift */; };
 /* End PBXBuildFile section */
 
@@ -29,14 +29,14 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRunevm.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRunevm.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		AF513F8127EDCD3D005E9C19 /* librunecoral.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = librunecoral.a; path = "install-ios-rel/lib/librunecoral.a"; sourceTree = "<group>"; };
+		AF9829D627F59ECC003F994A /* rune.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = rune.hpp; path = Classes/rune.hpp; sourceTree = "<group>"; };
 		AFFD0C5727E1E837003CD652 /* Runevm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Runevm.m; sourceTree = "<group>"; };
 		AFFD0C5827E1E837003CD652 /* ObjcppBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ObjcppBridge.h; path = Classes/ObjcppBridge.h; sourceTree = "<group>"; };
 		AFFD0C5927E1E837003CD652 /* runic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = runic.cpp; path = ../cpp/runic.cpp; sourceTree = "<group>"; };
 		AFFD0C5A27E1E837003CD652 /* ObjcppBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ObjcppBridge.mm; path = Classes/ObjcppBridge.mm; sourceTree = "<group>"; };
 		AFFD0C5B27E1E837003CD652 /* Runevm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Runevm.h; sourceTree = "<group>"; };
 		AFFD0C5F27E1E893003CD652 /* install-ios-rel */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "install-ios-rel"; sourceTree = "<group>"; };
-		AFFD0C6027E1E893003CD652 /* libfmtt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfmtt.a; path = "install-ios-rel/lib/libfmtt.a"; sourceTree = "<group>"; };
-		AFFD0C6127E1E893003CD652 /* libm3.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libm3.a; path = "install-ios-rel/lib/libm3.a"; sourceTree = "<group>"; };
 		AFFD0C6427E1E95E003CD652 /* Runevm-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runevm-Bridging-Header.h"; sourceTree = "<group>"; };
 		AFFD0C6527E1E95E003CD652 /* bridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = bridge.swift; sourceTree = "<group>"; };
 		AFFD0C6C27E28D84003CD652 /* librune_native.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = librune_native.a; path = "aarch64-apple-ios/librune_native.a"; sourceTree = "<group>"; };
@@ -48,7 +48,6 @@
 		AFFD0C7327E333B5003CD652 /* Log.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Log.hpp; path = "/Users/geerttrooskens/dev/hotg/react/react-native-runevm/ios/Log.hpp"; sourceTree = "<absolute>"; };
 		AFFD0C7427E333B5003CD652 /* Capabilities.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Capabilities.hpp; path = "/Users/geerttrooskens/dev/hotg/react/react-native-runevm/ios/Capabilities.hpp"; sourceTree = "<absolute>"; };
 		AFFD0C7727E33A3F003CD652 /* librune_native.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = librune_native.a; path = "install-ios-rel/lib/librune_native.a"; sourceTree = "<group>"; };
-		AFFD0C7927E33B9F003CD652 /* rune.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = rune.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,8 +55,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AFFD0C6227E1E893003CD652 /* libfmtt.a in Frameworks */,
-				AFFD0C6327E1E893003CD652 /* libm3.a in Frameworks */,
+				AF9829D927F5AD61003F994A /* librunecoral.a in Frameworks */,
+				AF9829D827F5AD3C003F994A /* librune_native.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -75,11 +74,9 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				AF9829D627F59ECC003F994A /* rune.hpp */,
 				AFFD0C6527E1E95E003CD652 /* bridge.swift */,
-				AFFD0C7927E33B9F003CD652 /* rune.hpp */,
 				AFFD0C5F27E1E893003CD652 /* install-ios-rel */,
-				AFFD0C6027E1E893003CD652 /* libfmtt.a */,
-				AFFD0C6127E1E893003CD652 /* libm3.a */,
 				AFFD0C5827E1E837003CD652 /* ObjcppBridge.h */,
 				AFFD0C5A27E1E837003CD652 /* ObjcppBridge.mm */,
 				AFFD0C5B27E1E837003CD652 /* Runevm.h */,
@@ -94,6 +91,7 @@
 		AFFD0C6B27E28D84003CD652 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				AF513F8127EDCD3D005E9C19 /* librunecoral.a */,
 				AFFD0C7727E33A3F003CD652 /* librune_native.a */,
 				AFFD0C7127E333B4003CD652 /* rune.h */,
 				AFFD0C7427E333B5003CD652 /* Capabilities.hpp */,
@@ -289,6 +287,7 @@
 		58B511F01A9E6C8500147676 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
 				CLANG_ENABLE_MODULES = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -314,6 +313,7 @@
 		58B511F11A9E6C8500147676 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
 				CLANG_ENABLE_MODULES = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -327,11 +327,13 @@
 					"$(PROJECT_DIR)/install-ios-rel/lib",
 					"$(PROJECT_DIR)/aarch64-apple-ios",
 				);
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = Runevm;
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "Runevm-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
+				VALIDATE_PRODUCT = NO;
 			};
 			name = Release;
 		};
