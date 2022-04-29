@@ -7,62 +7,40 @@
 
 #import "ObjcppBridge.h"
 
-#include "runic.hpp"
-#include "rune.hpp"
+
+#include "runetime.cpp"
 @implementation ObjcppBridge
 
-+ (NSArray*)loadManifestWithBytes: (const uint8_t *)bytes
+Runetime runetime;
+
++ (NSString*)loadManifestWithBytes: (const uint8_t *)bytes
                           ofLength:(int) len {
     
     struct rune::Config cfg = {
         .rune = bytes,
         .rune_len = len,
     };
-    rune::Runtime *runtime = NULL;
-    rune::Error *error = rune::rune_runtime_load(&cfg, &runtime);
-    if (error) {
-        printf("error 1");
-    }
-    rune::Metadata *inputs;
-    error = rune::rune_runtime_inputs(runtime, &inputs);
-    if (error) {
-        printf("error 2");
-    }
-    printf("whats up");
-    //const auto optCapabilities = runic_common::manifest(bytes, len, true);
-    //if(!optCapabilities)
-    //    return nullptr;
-    
-    auto *array = [[NSMutableArray alloc] init];
-    //for(auto number: *optCapabilities)
-    //    [array addObject:[NSNumber numberWithInt:number]];
-    
-    return array;
+    std::string result = runetime.load(cfg);
+    return [NSString stringWithCString:result.c_str() encoding:[NSString defaultCStringEncoding]];
 }
 
-+ (NSString*)callRunewithInput: (const uint8_t *_Nonnull)input
-                   withLengths: (NSArray*_Nonnull)lengths {
     
++ (void)addInputTensor: (int) node_id  input:(NSData*)data type:(int) type dimensions:(NSArray*)dimensions; {
 
-    
-    std::vector<uint8_t *> input_vector;
-    std::vector<uint32_t> input_length_vector;
-    int i;
-    int pos =0;
-    for (i = 0; i < lengths.count; ++i)
-    {
-
-        input_vector.push_back(reinterpret_cast<uint8_t*>(const_cast<uint8_t*>(input+pos)));
-        input_length_vector.push_back((uint32_t)[lengths[i] intValue]);
-        pos = pos + [lengths[i] intValue];
+    NSUInteger length = [data length] ;
+    uint8_t *bytes = (uint8_t *)[data bytes];
+    uint32_t dimensionsList[[dimensions count]];
+    for(int i =0;i<[dimensions count];i++) {
+        dimensionsList[i]=(uint32_t)[(NSNumber *)[dimensions objectAtIndex:i] unsignedIntValue];
     }
+    runetime.addInputTensor(node_id, bytes, (uint32_t)length, dimensionsList, [dimensions count], type);
+    
+}
+    
 
-    
-    const auto optJson = runic_common::callRune(input_vector, input_length_vector );
-    if(!optJson)
-        return nullptr;
-    
-    return [NSString stringWithCString:optJson->c_str() encoding:[NSString defaultCStringEncoding]];
++ (NSString*)callRune {
+    std::string result = runetime.run();
+    return [NSString stringWithCString:result.c_str() encoding:[NSString defaultCStringEncoding]];
 }
 
 + (float) floatFromBytes: (const uint8_t *_Nonnull) bytes {
