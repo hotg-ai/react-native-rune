@@ -4,9 +4,16 @@
 class Runetime
 {
 private:
-    rune::Runtime *runtime;
+    rune::Runtime *runtime = NULL;
     rune::Metadata *inputs;
     rune::InputTensors *input_tensors;
+    void log_func(void *user_data, const char *msg, int len)
+    {
+    }
+
+    void close_log_file(void *user_data)
+    {
+    }
 
 public:
     std::string run()
@@ -25,11 +32,19 @@ public:
         return getOutput();
     }
 
+    void freeRuntime()
+    {
+        rune::rune_input_tensors_free(input_tensors);
+        rune::rune_metadata_free(inputs);
+        rune::rune_runtime_free(runtime);
+    }
+
     void addInputTensor(int raw_node_id, uint8_t *input, uint32_t length, uint32_t *dimensions, int rank, int type)
     {
         size_t dimensionsUnsigned[rank];
-        for(int i = 0;i<rank;i++) {
-            dimensionsUnsigned[i]= *(dimensions+i);
+        for (int i = 0; i < rank; i++)
+        {
+            dimensionsUnsigned[i] = *(dimensions + i);
         }
         rune::Tensor *raw_input = rune_input_tensors_insert(
             input_tensors,
@@ -43,7 +58,10 @@ public:
 
     std::string load(rune::Config cfg)
     {
-        runtime = NULL;
+        if (runtime != NULL)
+        {
+            freeRuntime();
+        }
         rune::Error *error = rune::rune_runtime_load(&cfg, &runtime);
         if (error)
         {
@@ -59,7 +77,7 @@ public:
             return msg;
         }
         input_tensors = rune_runtime_input_tensors(runtime);
-
+        rune::rune_runtime_set_logger(runtime, log_func, NULL, close_log_file);
         return getManifest();
     }
 
@@ -119,7 +137,7 @@ public:
                     const uint8_t *pointer;
                     int strlength = rune::rune_string_tensor_get_by_index(variable, i, &pointer);
                     const char *text = reinterpret_cast<const char *>(pointer);
-                    output.append(std::string("\"")+std::string(text)+std::string("\""));
+                    output.append(std::string("\"") + std::string(text) + std::string("\""));
                 }
                 output.append(std::string("]"));
             }
@@ -212,6 +230,7 @@ public:
             output.append(std::string("}"));
         }
         output.append(std::string("]"));
+        rune::rune_output_tensors_free(outputs);
         return output;
     }
     std::string getManifest()
