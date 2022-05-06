@@ -11,7 +11,7 @@
 import React, { Component, PureComponent } from 'react';
 import { RNCamera } from 'react-native-camera';
 import { Platform, StyleSheet, Text, View, Pressable } from 'react-native';
-import Runevm from 'react-native-runevm';
+import Runevm, { TensorType } from 'react-native-runevm';
 import base64 from 'react-native-base64'
 import Image from 'image-js';
 import toUint8Array from 'base64-to-uint8array';
@@ -51,6 +51,7 @@ export default class App extends Component<{}> {
             buttonNegative: 'Cancel',
           }} />)}
         {message != 'Loading rune from server...' && (<Pressable style={styles.button} onPress={this.runRune} ><Text style={{ color: "#FFFFFF", fontSize: 32 }}>Run Inference</Text></Pressable>)}
+        {message != 'Loading rune from server...' && (<Pressable style={styles.button} onPress={this.loadRune} ><Text style={{ color: "#FFFFFF", fontSize: 32 }}>Reload Model</Text></Pressable>)}
         <Text style={{ fontSize: 12 }}>{message}</Text>
       </View>
     );
@@ -102,16 +103,23 @@ export default class App extends Component<{}> {
         bytes[p * 3 + 2] = grid[p * 4 + 2];
       }
       const b64encoded = base64.encodeFromByteArray(bytes);
-      await Runevm.addInput(1, b64encoded, [width, width, 3], 0, (message) => {
+      //Add input data
+      await Runevm.addInput(1, b64encoded, [width, width, 3], TensorType.U8, (message) => {
         this.setState(() => {
           return { message: message };
         });
       });
-      let message = await Runevm.runRune((message) => {
+
+      //Run model
+      await Runevm.runRune((message) => {
         this.setState(() => {
           return { message: message };
-          //return { message: JSON.stringify(JSON.parse(message)[0]["elements"]) };
         });
+      });
+
+      //Retrieve detailed logs of inference
+      await Runevm.getRuneLogs((logs) => {
+        console.log(logs);
       });
     }
 

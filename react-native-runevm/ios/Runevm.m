@@ -46,15 +46,19 @@ RCT_EXPORT_METHOD(loadWasm:(NSString *)base64Encoded callback:(RCTResponseSender
 
 RCT_EXPORT_METHOD(addInput:(NSNumber * _Nonnull)nodeId  input:(NSString *)base64Encoded  dimensions:(NSArray *)dimensions type:(NSNumber * _Nonnull)type  callback:(RCTResponseSenderBlock)callback)
 {
-    NSLog(@"addInputTensor");
     NSData *data = [[NSData alloc]initWithBase64EncodedString:base64Encoded options:0];
     [ObjcppBridge addInputTensor:[nodeId intValue] input:data type:[type intValue] dimensions:dimensions];
     callback(@[[NSString stringWithFormat: @"ok"]]);
 }
 
+RCT_EXPORT_METHOD(getRuneLogs:(RCTResponseSenderBlock)callback)
+{
+    NSString *output = [ObjcppBridge getLogs];
+    callback(@[[NSString stringWithFormat: @"%@",output]]);
+}
+
 RCT_EXPORT_METHOD(runRune:(RCTResponseSenderBlock)callback)
 {
-    NSLog(@"runRune");
     NSString *output = [ObjcppBridge callRune];
     callback(@[[NSString stringWithFormat: @"%@",output]]);
 }

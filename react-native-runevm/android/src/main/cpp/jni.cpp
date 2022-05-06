@@ -64,38 +64,31 @@ namespace
         return JByteArrayData(std::move(data), size);
     }
 
-    /* struct AndroidLogger : public rune_vm::ILogger
-     {
-     private:
-         void log(
-             const rune_vm::Severity severity,
-             const std::string &module,
-             const std::string &message) const noexcept
-         {
-             const auto androidSeverity = [severity]
-             {
-                 switch (severity)
-                 {
-                 case rune_vm::Severity::Debug:
-                     return ANDROID_LOG_DEBUG;
-                 case rune_vm::Severity::Info:
-                     return ANDROID_LOG_INFO;
-                 case rune_vm::Severity::Warning:
-                     return ANDROID_LOG_WARN;
-                 case rune_vm::Severity::Error:
-                     return ANDROID_LOG_ERROR;
-                 default:
-                     return ANDROID_LOG_ERROR;
-                 }
-             }();
-
-             __android_log_print(androidSeverity, module.c_str(), "%s", message.c_str());
-         }
-     };*/
 }
 
 extern "C"
 {
+
+    Runetime runetime;
+    std::string logs = "";
+    void logger(void *user_data, const char *msg, int len)
+    {
+        __android_log_print(ANDROID_LOG_DEBUG, "LOG_TAG", "[Rune Logger] %s", msg);
+        if (logs.length() > 0)
+        {
+            logs = logs + ",";
+        }
+        const std::string_view text{reinterpret_cast<const char *>(msg), static_cast<size_t>(len)};
+        logs = logs + std::string{text};
+    }
+
+    JNIEXPORT jstring JNICALL
+    Java_com_reactlibrary_RunevmModule_getLogs(JNIEnv *env, jobject thiz)
+    {
+        std::string log_output = "[" + logs + "]";
+        logs = "";
+        return env->NewStringUTF(log_output.c_str());
+    }
     JNIEXPORT jint JNICALL
     JNI_OnLoad(JavaVM *vm, void *reserved)
     {
@@ -106,13 +99,10 @@ extern "C"
             return JNI_ERR; // JNI version not supported
         }
 
-        // set logger
-        // runic_common::setLogger(std::make_shared<AndroidLogger>());
+        runetime.logger = &logger;
 
         return JNI_VERSION_1_6;
     }
-
-    Runetime runetime;
 
     JNIEXPORT jstring JNICALL
     Java_com_reactlibrary_RunevmModule_getManifest(JNIEnv *env, jobject thiz, jbyteArray wasm)
@@ -151,16 +141,6 @@ extern "C"
     {
         std::string result = runetime.run();
         __android_log_print(ANDROID_LOG_DEBUG, "LOG_TAG", "INFERENCE OUTPUT %s", result.c_str());
-
-        // hack to avoid non utf8 bytes ;-(
-        const char *output_pos = result.data();
-        for (int i = 0; i < result.length(); i++)
-        {
-            if (*(output_pos + i) >= 128)
-            {
-                result.replace(i, 1, " ");
-            }
-        }
 
         return env->NewStringUTF(result.c_str());
     }

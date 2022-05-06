@@ -13,9 +13,10 @@
 
 Runetime runetime;
 
+
 + (NSString*)loadManifestWithBytes: (const uint8_t *)bytes
                           ofLength:(int) len {
-    
+    runetime.logger = &logger;
     struct rune::Config cfg = {
         .rune = bytes,
         .rune_len = len,
@@ -36,7 +37,22 @@ Runetime runetime;
     runetime.addInputTensor(node_id, bytes, (uint32_t)length, dimensionsList, [dimensions count], type);
     
 }
-    
+
+std::string logs = "";
+void logger(void *user_data, const char *msg, int len)
+{
+    if (logs.length()>0) {
+        logs = logs + ",";
+    }
+    const std::string_view text{reinterpret_cast<const char *>(msg), static_cast<size_t>(len)};
+    logs = logs + std::string{text};
+}
+
++ (NSString *)getLogs{
+    std::string log_output = "["+logs+"]";
+    logs="";
+    return [NSString stringWithCString:log_output.c_str() encoding:[NSString defaultCStringEncoding]];
+}
 
 + (NSString*)callRune {
     std::string result = runetime.run();

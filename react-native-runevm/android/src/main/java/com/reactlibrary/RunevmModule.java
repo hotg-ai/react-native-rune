@@ -43,6 +43,12 @@ public class RunevmModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void getRuneLogs(Callback callback) {
+        String logs = getLogs();
+        callback.invoke(logs);
+    }
+
+    @ReactMethod
     public void addInput(int nodeId, String base64, ReadableArray dimensions, int type, Callback callback) {
         byte[] bytes = Base64.getDecoder().decode(base64);
         int dimensionsArray[] = new int[dimensions.size()];

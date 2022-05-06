@@ -4,12 +4,19 @@
 class Runetime
 {
 private:
-    rune::Runtime *runtime;
+    rune::Runtime *runtime = NULL;
     rune::Metadata *inputs;
     rune::InputTensors *input_tensors;
 
+    static void close_log_file(void *user_data)
+    {
+    }
+
 public:
-    std::string run()
+    rune::Logger logger;
+
+    std::string
+    run()
     {
         rune::Error *error = rune_runtime_predict(runtime);
         if (error)
@@ -25,11 +32,19 @@ public:
         return getOutput();
     }
 
+    void freeRuntime()
+    {
+        rune::rune_input_tensors_free(input_tensors);
+        rune::rune_metadata_free(inputs);
+        rune::rune_runtime_free(runtime);
+    }
+
     void addInputTensor(int raw_node_id, uint8_t *input, uint32_t length, uint32_t *dimensions, int rank, int type)
     {
         size_t dimensionsUnsigned[rank];
-        for(int i = 0;i<rank;i++) {
-            dimensionsUnsigned[i]= *(dimensions+i);
+        for (int i = 0; i < rank; i++)
+        {
+            dimensionsUnsigned[i] = *(dimensions + i);
         }
         rune::Tensor *raw_input = rune_input_tensors_insert(
             input_tensors,
@@ -43,7 +58,10 @@ public:
 
     std::string load(rune::Config cfg)
     {
-        runtime = NULL;
+        if (runtime != NULL)
+        {
+            freeRuntime();
+        }
         rune::Error *error = rune::rune_runtime_load(&cfg, &runtime);
         if (error)
         {
@@ -59,6 +77,10 @@ public:
             return msg;
         }
         input_tensors = rune_runtime_input_tensors(runtime);
+        if (logger != NULL)
+        {
+            rune::rune_runtime_set_logger(runtime, logger, NULL, close_log_file);
+        }
 
         return getManifest();
     }
@@ -84,15 +106,15 @@ public:
             const rune::Tensor *fixed = rune::rune_output_tensor_as_fixed(output_tensor);
 
             output.append(std::string("{"));
-            output.append(std::string("\"output_id:\"") + std::to_string(output_id) + std::string(","));
+            output.append(std::string("\"output_id\":") + std::to_string(output_id) + std::string(","));
             if (!fixed)
             {
                 // string tensor
                 const rune::StringTensor *variable = rune::rune_output_tensor_as_string_tensor(output_tensor);
                 size_t rank = rune::rune_string_tensor_rank(variable);
                 const size_t *dimensions = rune::rune_string_tensor_dimensions(variable);
-                output.append(std::string("\"rank:\"") + std::to_string(rank) + std::string(","));
-                output.append(std::string("\"element_type:\":\"UTF8\"") + std::string(","));
+                output.append(std::string("\"rank\":") + std::to_string(rank) + std::string(","));
+                output.append(std::string("\"element_type\":\"UTF8\"") + std::string(","));
                 output.append(std::string("\"dimensions\":["));
                 int length = 1;
                 for (int i = 0; i < rank; i++)
@@ -116,10 +138,11 @@ public:
                     {
                         output.append(std::string(","));
                     }
-                    const uint8_t *pointer;
+                    const unsigned char *pointer;
                     int strlength = rune::rune_string_tensor_get_by_index(variable, i, &pointer);
-                    const char *text = reinterpret_cast<const char *>(pointer);
-                    output.append(std::string("\"")+std::string(text)+std::string("\""));
+
+                    const std::string_view text{reinterpret_cast<const char *>(pointer), static_cast<size_t>(strlength)};
+                    output.append(std::string("\"") + std::string{text} + std::string("\""));
                 }
                 output.append(std::string("]"));
             }
@@ -202,16 +225,10 @@ public:
                 output.append(std::string("]"));
             }
 
-            // output.append(std::string(" dimensions: %s", dimensions));
-            //  output.append(std::string("rank: %zu", rank));
-            //  if (element_type == rune::F32 && rank == 2 && dimensions[0] == 1 && dimensions[1] == 1)
-            //{
-            //  float value = *(float *)rune::rune_tensor_buffer_readonly(fixed);
-            //  output.append("\tOutput %d = [[%f]]\n", output_id, value);
-            // }
             output.append(std::string("}"));
         }
         output.append(std::string("]"));
+        rune::rune_output_tensors_free(outputs);
         return output;
     }
     std::string getManifest()
