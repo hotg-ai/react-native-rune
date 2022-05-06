@@ -102,11 +102,13 @@ export default class App extends Component<{}> {
         bytes[p * 3 + 1] = grid[p * 4 + 1];
         bytes[p * 3 + 2] = grid[p * 4 + 2];
       }
+
+
       const b64encoded = base64.encodeFromByteArray(bytes);
       //Add input data
-      await Runevm.addInput(1, b64encoded, [width, width, 3], TensorType.U8, (message) => {
+      await Runevm.addInput(1, b64encoded, [width, width, 3], TensorType.U8, (response) => {
         this.setState(() => {
-          return { message: message };
+          return { message: response };
         });
       });
 
