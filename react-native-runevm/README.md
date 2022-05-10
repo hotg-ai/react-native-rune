@@ -1,6 +1,6 @@
 # react-native-runevm
 
-Run rune container in React Native (iOS & Android)
+Run Rune container in React Native (iOS & Android)
 
 ## Getting started
 
