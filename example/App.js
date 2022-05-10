@@ -11,7 +11,7 @@
 import React, { Component, PureComponent } from 'react';
 import { RNCamera } from 'react-native-camera';
 import { Platform, StyleSheet, Text, View, Pressable } from 'react-native';
-import Runevm, { TensorType } from 'react-native-runevm';
+import Runevm, { TensorType } from '@hotg-ai/react-native-runevm';
 import base64 from 'react-native-base64'
 import Image from 'image-js';
 import toUint8Array from 'base64-to-uint8array';

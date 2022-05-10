@@ -17,7 +17,7 @@
     "react-native": "^0.68.1",
     "react-native-base64": "^0.2.1",
     "react-native-camera": "^4.2.1",
-    "react-native-runevm": "file:../react-native-runevm"
+    "@hotg-ai/react-native-runevm": "file:../react-native-runevm"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

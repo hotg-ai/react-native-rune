@@ -1,8 +1,11 @@
 {
-  "name": "react-native-runevm",
+  "name": "@hotg-ai/react-native-runevm",
   "title": "React Native Runevm",
-  "version": "1.0.0",
-  "description": "TODO",
+  "version": "0.1.1",
+  "description": "Rune runtime",
+  "homepage": "https://hotg.dev/",
+  "author": "The Rune Developers <developers@hotg.ai>",
+  "license": "MIT OR Apache-2.0",
   "main": "index.js",
   "files": [
     "README.md",
@@ -22,12 +25,6 @@
   "keywords": [
     "react-native"
   ],
-  "author": {
-    "name": "Your Name",
-    "email": "yourname@email.com"
-  },
-  "license": "MIT",
-  "licenseFilename": "LICENSE",
   "readmeFilename": "README.md",
   "peerDependencies": {
     "react": "17.0.2",
@@ -36,6 +33,5 @@
   "devDependencies": {
     "react": "17.0.2",
     "react-native": "0.65.1"
-    
   }
 }

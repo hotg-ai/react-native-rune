@@ -406,7 +406,7 @@ DEPENDENCIES:
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - react-native-camera (from `../node_modules/react-native-camera`)
-  - react-native-runevm (from `../../react-native-runevm`)
+  - "react-native-runevm (from `../node_modules/@hotg-ai/react-native-runevm`)"
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
@@ -479,7 +479,7 @@ EXTERNAL SOURCES:
   react-native-camera:
     :path: "../node_modules/react-native-camera"
   react-native-runevm:
-    :path: "../../react-native-runevm"
+    :path: "../node_modules/@hotg-ai/react-native-runevm"
   React-perflogger:
     :path: "../node_modules/react-native/ReactCommon/reactperflogger"
   React-RCTActionSheet:
