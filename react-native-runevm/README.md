@@ -21,22 +21,23 @@ We recommend using 'react-native-base64' package for this:
 import Runevm, { TensorType } from 'react-native-runevm';
 import base64 from 'react-native-base64';
 
-const b64encoded = base64.encodeFromByteArray(runeBytes); //bytes is a Uint8Array containing the rune
-
 //init the Rune 
+
+const b64encoded = base64.encodeFromByteArray(runeBytes); //bytes is a Uint8Array containing the rune
 let message = await Runevm.loadWasm(b64encoded, (message) => {
   //json formatted manifest file
   console.log(message);
 });
 
 //add input before running inference (eg image data)
+
 const b64encoded = base64.encodeFromByteArray(inputBytes);
-      
 await Runevm.addInput(1, b64encoded, [width, width, 3], TensorType.U8, (response) => {
   console.log(response);
 });
 
 //Run model
+
 await Runevm.runRune((message) => {
   this.setState(() => {
     return { message: message };
@@ -44,6 +45,7 @@ await Runevm.runRune((message) => {
 });
 
 //Retrieve logs of inference
+
 await Runevm.getRuneLogs((logs) => {
   console.log(logs);
 });
