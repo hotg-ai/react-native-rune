@@ -1,7 +1,7 @@
 {
   "name": "@hotg-ai/react-native-runevm",
   "title": "React Native Runevm",
-  "version": "0.1.1",
+  "version": "0.1.3",
   "description": "Rune runtime",
   "homepage": "https://hotg.dev/",
   "author": "The Rune Developers <developers@hotg.ai>",
@@ -17,11 +17,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/github_account/react-native-runevm.git",
-    "baseUrl": "https://github.com/github_account/react-native-runevm"
-  },
+  "repository": "https://github.com/hotg-ai/react-native-rune",
   "keywords": [
     "react-native"
   ],
